@@ -79,6 +79,8 @@ fn main() {
     let default_link_static = true;
     let php_version = option_env!("PHP_VERSION").unwrap_or(PHP_VERSION);
     let macros = Arc::new(RwLock::new(HashSet::new()));
+    // Create the target directory if it doesn't exist
+    std::fs::create_dir_all(target("")).unwrap();
 
     println!("cargo:rerun-if-env-changed=PHP_VERSION");
     println!("cargo:rerun-if-env-changed=PHP_LINK_STATIC");
@@ -99,6 +101,7 @@ fn main() {
                 "clone",
                 "https://github.com/php/php-src",
                 format!("--branch={}", php_version).as_str(),
+                "--depth=1",
             ],
         );
         run_command_or_fail(
@@ -112,7 +115,7 @@ fn main() {
                 "Zend/zend_signal.h",
             ],
         );
-        run_command_or_fail(target("php-src"), "./genfiles", &[]);
+        run_command_or_fail(target("php-src"), "./scripts/dev/genfiles", &[]);
         run_command_or_fail(target("php-src"), "./buildconf", &["--force"]);
 
         let embed_type = if link_static { "static" } else { "shared" };
@@ -123,14 +126,14 @@ fn main() {
             &format!("--enable-embed={}", embed_type),
             "--disable-cli",
             "--disable-cgi",
-            "--enable-maintainer-zts",
+            "--enable-zts",
             // "--without-iconv",
-            "--disable-libxml",
-            "--disable-dom",
-            "--disable-xml",
-            "--disable-simplexml",
-            "--disable-xmlwriter",
-            "--disable-xmlreader",
+            //"--disable-libxml",
+            //"--disable-dom",
+            //"--disable-xml",
+            //"--disable-simplexml",
+            //"--disable-xmlwriter",
+            //"--disable-xmlreader",
             // "--without-pear",
             // "--with-libdir=lib64",
             // "--with-pic",
@@ -141,14 +144,14 @@ fn main() {
             &format!("--enable-embed={}", embed_type),
             "--disable-cli",
             "--disable-cgi",
-            "--enable-maintainer-zts",
-            "--without-iconv",
-            "--disable-libxml",
-            "--disable-dom",
-            "--disable-xml",
-            "--disable-simplexml",
-            "--disable-xmlwriter",
-            "--disable-xmlreader",
+            "--enable-zts",
+            //"--without-iconv",
+            //"--disable-libxml",
+            //"--disable-dom",
+            //"--disable-xml",
+            //"--disable-simplexml",
+            //"--disable-xmlwriter",
+           // "--disable-xmlreader",
             // "--without-pear",
             // "--with-libdir=lib64",
             // "--with-pic",
@@ -162,7 +165,7 @@ fn main() {
 
     let link_type = if link_static { "=static" } else { "" };
 
-    println!("cargo:rustc-link-lib{}=php7", link_type);
+    println!("cargo:rustc-link-lib{}=php8", link_type);
     println!("cargo:rustc-link-search=native={}", lib_dir);
 
     let includes = ["/", "/TSRM", "/Zend", "/main"]
@@ -173,32 +176,32 @@ fn main() {
     let bindings = Builder::default()
         .rustfmt_bindings(true)
         .clang_args(includes)
-        .whitelist_function("_zend_file_handle__bindgen_ty_1")
-        .whitelist_function("php_execute_script")
-        .whitelist_function("php_module_startup")
-        .whitelist_function("php_request_shutdown")
-        .whitelist_function("php_request_startup")
-        .whitelist_function("phprpm_fopen")
-        .whitelist_function("sapi_send_headers")
-        .whitelist_function("sapi_startup")
-        .whitelist_function("sg_request_info")
-        .whitelist_function("sg_sapi_headers")
-        .whitelist_function("sg_server_context")
-        .whitelist_function("sg_server_context")
-        .whitelist_function("sg_set_server_context")
-        .whitelist_function("sg_set_server_context")
-        .whitelist_function("ts_resource_ex")
-        .whitelist_function("tsrm_startup")
-        .whitelist_function("zend_error")
-        .whitelist_function("zend_signal_startup")
-        .whitelist_function("zend_tsrmls_cache_update")
-        .whitelist_var("SAPI_HEADER_SENT_SUCCESSFULLY")
-        .whitelist_type("sapi_headers_struc")
-        .whitelist_type("sapi_module_struc")
-        .whitelist_type("sapi_request_info")
-        .whitelist_type("ZEND_RESULT_CODE")
-        .whitelist_type("zval")
-        .whitelist_var("zend_stream_type_ZEND_HANDLE_FP")
+        .allowlist_function("_zend_file_handle__bindgen_ty_1")
+        .allowlist_function("php_execute_script")
+        .allowlist_function("php_module_startup")
+        .allowlist_function("php_request_shutdown")
+        .allowlist_function("php_request_startup")
+        .allowlist_function("phprpm_fopen")
+        .allowlist_function("sapi_send_headers")
+        .allowlist_function("sapi_startup")
+        .allowlist_function("sg_request_info")
+        .allowlist_function("sg_sapi_headers")
+        .allowlist_function("sg_server_context")
+        .allowlist_function("sg_server_context")
+        .allowlist_function("sg_set_server_context")
+        .allowlist_function("sg_set_server_context")
+        .allowlist_function("ts_resource_ex")
+        .allowlist_function("tsrm_startup")
+        .allowlist_function("zend_error")
+        .allowlist_function("zend_signal_startup")
+        .allowlist_function("zend_tsrmls_cache_update")
+        .allowlist_var("SAPI_HEADER_SENT_SUCCESSFULLY")
+        .allowlist_type("sapi_headers_struc")
+        .allowlist_type("sapi_module_struc")
+        .allowlist_type("sapi_request_info")
+        .allowlist_type("ZEND_RESULT_CODE")
+        .allowlist_type("zval")
+        .allowlist_var("zend_stream_type_ZEND_HANDLE_FP")
         .parse_callbacks(Box::new(MacroCallback {
             macros: macros.clone(),
         })).derive_default(true)
