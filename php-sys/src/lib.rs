@@ -12,6 +12,14 @@ extern "C" {
     pub fn sg_set_headers_sent(is_sent: c_uchar);
     pub fn zend_tsrmls_cache_update();
     pub fn phprpm_fopen(filename: *const c_char, mode: *const c_char) -> *mut FILE;
+    pub fn _zend_string_init(str: *const c_char, len: usize, persistent: bool) -> *mut zend_string;
+    pub fn _zend_string_release(s: *mut zend_string);
+    pub fn _zend_string_release_ex(s: *mut zend_string, persistent: bool);
+    pub fn _zend_string_realloc(s: *mut zend_string, len: usize, persistent: bool) -> *mut zend_string;
+    pub fn _zend_string_extend(s: *mut zend_string, len: usize, persistent: bool) -> *mut zend_string;
+    pub fn _zend_string_truncate(s: *mut zend_string, len: usize, persistent: bool) -> *mut zend_string;
+    pub fn _zend_string_dup(s: *mut zend_string, persistent: bool) -> *mut zend_string;
+    pub fn _zend_string_copy(s: *mut zend_string) -> *mut zend_string;
 }
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));

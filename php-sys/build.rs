@@ -122,7 +122,7 @@ fn main() {
 
         #[cfg(all(target_os = "linux"))]
         let config = &[
-            "--enable-debug",
+            //"--enable-debug",
             &format!("--enable-embed={}", embed_type),
             "--disable-cli",
             "--disable-cgi",
@@ -140,7 +140,7 @@ fn main() {
         ];
         #[cfg(all(target_os = "macos"))]
         let config = &[
-            "--enable-debug",
+            //"--enable-debug",
             &format!("--enable-embed={}", embed_type),
             "--disable-cli",
             "--disable-cgi",
@@ -165,8 +165,8 @@ fn main() {
 
     let link_type = if link_static { "=static" } else { "" };
 
-    println!("cargo:rustc-link-lib{}=php8", link_type);
-    println!("cargo:rustc-link-search=native={}", lib_dir);
+    println!("cargo:rustc-link-lib{}=php", link_type);
+    println!("cargo:rustc-link-search={}", lib_dir);
 
     let includes = ["/", "/TSRM", "/Zend", "/main"]
         .iter()
@@ -201,13 +201,14 @@ fn main() {
         .allowlist_function("_zend_string_extend")
         .allowlist_function("_zend_string_truncate")
         .allowlist_function("_zend_string_dup")
+        .allowlist_function("_zend_string_copy")
         .allowlist_var("SAPI_HEADER_SENT_SUCCESSFULLY")
         .allowlist_type("sapi_headers_struc")
         .allowlist_type("sapi_module_struc")
         .allowlist_type("sapi_request_info")
         .allowlist_type("ZEND_RESULT_CODE")
+        .allowlist_type("zend_stream_type")
         .allowlist_type("zval")
-        .allowlist_var("zend_stream_type_ZEND_HANDLE_FP")
         .parse_callbacks(Box::new(MacroCallback {
             macros: macros.clone(),
         })).derive_default(true)

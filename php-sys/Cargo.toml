@@ -1,7 +1,7 @@
 [package]
 name = "php-sys-ng"
 description = "Native PHP bindings for Rust"
-version = "9.0.0"
+version = "9.0.1"
 authors = ["Aaron Dewes <aaron@nirvati.org>", "Herman J. Radtke III <herman@hermanradtke.com>", "Heinz Gies <heinz@licenser.net>"]
 links = "php8"
 build = "build.rs"

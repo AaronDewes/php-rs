@@ -46,3 +46,43 @@ void zend_tsrmls_cache_update() {
 FILE *phprpm_fopen(const char *filename, const char *mode) {
     return fopen(filename, mode);
 }
+
+zend_string *_zend_string_init(const char *str, size_t len, bool persistent)
+{
+	return zend_string_init(str, len, persistent);
+}
+
+void _zend_string_release(zend_string *s)
+{
+    zend_string_release(s);
+}
+
+void _zend_string_release_ex(zend_string *s, bool persistent)
+{
+    zend_string_release_ex(s, persistent);
+}
+
+zend_string *_zend_string_realloc(zend_string *s, size_t len, bool persistent)
+{
+    return zend_string_realloc(s, len, persistent);
+}
+
+zend_string *_zend_string_extend(zend_string *s, size_t len, bool persistent)
+{
+    return zend_string_extend(s, len, persistent);
+}
+
+zend_string *_zend_string_truncate(zend_string *s, size_t len, bool persistent)
+{
+    return zend_string_truncate(s, len, persistent);
+}
+
+zend_string *_zend_string_dup(zend_string *s, bool persistent)
+{
+    return zend_string_dup(s, persistent);
+}
+
+zend_string *_zend_string_copy(zend_string *s)
+{
+    return zend_string_copy(s);
+}
