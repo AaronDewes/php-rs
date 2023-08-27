@@ -12,7 +12,7 @@ use std::path::PathBuf;
 use std::process::Command;
 use std::sync::{Arc, RwLock};
 
-const PHP_VERSION: &'static str = concat!("php-", env!("CARGO_PKG_VERSION"));
+const PHP_VERSION: &'static str = "php-8.2.9";
 
 /// println_stderr and run_command_or_fail are copied from rdkafka-sys
 macro_rules! println_stderr(
@@ -172,9 +172,8 @@ fn main() {
         .iter()
         .map(|d| format!("-I{}{}", include_dir, d))
         .collect::<Vec<String>>();
-
+    dbg!(includes.clone().join(" "));
     let bindings = Builder::default()
-        .rustfmt_bindings(true)
         .clang_args(includes)
         .allowlist_function("_zend_file_handle__bindgen_ty_1")
         .allowlist_function("php_execute_script")
@@ -195,6 +194,13 @@ fn main() {
         .allowlist_function("zend_error")
         .allowlist_function("zend_signal_startup")
         .allowlist_function("zend_tsrmls_cache_update")
+        .allowlist_function("_zend_string_init")
+        .allowlist_function("_zend_string_release")
+        .allowlist_function("_zend_string_release_ex")
+        .allowlist_function("_zend_string_realloc")
+        .allowlist_function("_zend_string_extend")
+        .allowlist_function("_zend_string_truncate")
+        .allowlist_function("_zend_string_dup")
         .allowlist_var("SAPI_HEADER_SENT_SUCCESSFULLY")
         .allowlist_type("sapi_headers_struc")
         .allowlist_type("sapi_module_struc")
@@ -208,7 +214,6 @@ fn main() {
         .header("wrapper.h")
         .generate()
         .expect("Unable to generate bindings");
-
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     bindings
         .write_to_file(out_path.join("bindings.rs"))
