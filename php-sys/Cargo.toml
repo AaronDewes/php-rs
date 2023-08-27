@@ -1,9 +1,12 @@
 [package]
 name = "php-sys-ng"
+description = "PHP bindings for Rust"
 version = "8.2.9"
-authors = ["Herman J. Radtke III <herman@hermanradtke.com>", "Heinz Gies <heinz@licenser.net>"]
-links = "php7"
+authors = ["Aaron Dewes <aaron@nirvati.org>", "Herman J. Radtke III <herman@hermanradtke.com>", "Heinz Gies <heinz@licenser.net>"]
+links = "php8"
 build = "build.rs"
+edition = "2021"
+license = "MIT"
 
 [build-dependencies]
 bindgen = "0.66"
